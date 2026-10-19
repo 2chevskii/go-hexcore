@@ -1,0 +1,183 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  GOTOOLCHAIN: local
+  HEXCORE_LIVE: "0"
+  HEXCORE_LIVE_WRITES: "0"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality:
+    name: Formatting and module checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up minimum Go version
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.22.x"
+          check-latest: true
+          cache-dependency-path: go.mod
+
+      - name: Check formatting
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [[ -n "$unformatted" ]]; then
+            printf '%s\n' "$unformatted"
+            echo '::error::Run go fmt ./... and commit the formatting changes.'
+            exit 1
+          fi
+
+      - name: Check module files
+        run: |
+          go mod tidy
+          changes="$(git status --porcelain -- go.mod go.sum)"
+          if [[ -n "$changes" ]]; then
+            printf '%s\n' "$changes"
+            echo '::error::Run go mod tidy with Go 1.22 and commit the module files.'
+            exit 1
+          fi
+          go mod verify
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+  tests:
+    name: Go ${{ matrix.go }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            go: "1.22.x"
+          - os: ubuntu-24.04
+            go: oldstable
+          - os: ubuntu-24.04
+            go: stable
+          - os: windows-2025
+            go: stable
+          - os: macos-26
+            go: stable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+          check-latest: true
+          cache-dependency-path: go.mod
+
+      - name: Validate workflow definitions
+        if: matrix.os == 'ubuntu-24.04' && matrix.go == 'stable'
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+
+      - name: Run offline tests
+        env:
+          GO_VERSION: ${{ matrix.go }}
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" && "$GO_VERSION" == "stable" ]]; then
+            go test -race -count=1 -covermode=atomic -coverprofile=coverage.out -json ./... | tee test-results.json
+          else
+            go test -count=1 -json ./... | tee test-results.json
+          fi
+
+      - name: Upload test results
+        if: ${{ !cancelled() && hashFiles('test-results.json') != '' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.go }}
+          path: test-results.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Summarize coverage
+        if: matrix.os == 'ubuntu-24.04' && matrix.go == 'stable'
+        run: |
+          go tool cover -func=coverage.out > coverage.txt
+          {
+            echo '## Statement coverage'
+            echo '```text'
+            cat coverage.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-24.04' && matrix.go == 'stable'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage
+          path: |
+            coverage.out
+            coverage.txt
+          if-no-files-found: error
+          retention-days: 7
+
+  pr-title:
+    name: Conventional Commit PR title
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Validate title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          node <<'NODE'
+          const pattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^()\r\n]+\))?!?: \S.*$/;
+          if (!pattern.test(process.env.PR_TITLE || '')) {
+            console.error('Use a Conventional Commit title, for example: fix(client): preserve cancellation errors');
+            process.exit(1);
+          }
+          NODE
+
+  ci:
+    name: CI
+    if: ${{ always() }}
+    needs: [quality, tests, pr-title]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check required results
+        env:
+          QUALITY_RESULT: ${{ needs.quality.result }}
+          TEST_RESULT: ${{ needs.tests.result }}
+          TITLE_RESULT: ${{ needs.pr-title.result }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          [[ "$QUALITY_RESULT" == "success" ]]
+          [[ "$TEST_RESULT" == "success" ]]
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            [[ "$TITLE_RESULT" == "success" ]]
+          else
+            [[ "$TITLE_RESULT" == "skipped" ]]
+          fi

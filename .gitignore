@@ -4,3 +4,5 @@
 *.test
 *.test.exe
 coverage.out
+coverage.txt
+test-results.json
