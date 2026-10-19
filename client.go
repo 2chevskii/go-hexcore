@@ -30,6 +30,7 @@ type Config struct {
 // callers do not replace service fields or mutate the supplied HTTP client.
 type Client struct {
 	Account      *AccountService
+	Actions      *ActionsService
 	VDS          *VDSService
 	Disks        *DisksService
 	Regions      *RegionsService
@@ -66,6 +67,7 @@ func NewClient(cfg Config) (*Client, error) {
 	}
 	c := &Client{token: cfg.Token, baseURL: strings.TrimRight(u.String(), "/"), http: cfg.HTTPClient, userAgent: cfg.UserAgent}
 	c.Account = &AccountService{c}
+	c.Actions = &ActionsService{c}
 	c.VDS = &VDSService{c}
 	c.Disks = &DisksService{c}
 	c.Regions = &RegionsService{c}

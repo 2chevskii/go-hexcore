@@ -188,6 +188,30 @@ func TestResponseBodyCleanup(t *testing.T) {
 	}
 }
 
+func TestInvalidResourceIDs(t *testing.T) {
+	c, err := hexcore.NewClient(hexcore.Config{Token: "test", HTTPClient: &http.Client{Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
+		t.Error("invalid input made an HTTP request")
+		return nil, errors.New("unexpected request")
+	})}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, id := range []string{"", ".", "..", "1/2", "1?x", "1#x", "1\\2", "1\n2", " 1"} {
+		for _, call := range []func() error{
+			func() error { _, err := c.VDS.Get(context.Background(), id); return err },
+			func() error { return c.VDS.Destroy(context.Background(), id) },
+			func() error { _, err := c.Actions.Get(context.Background(), id); return err },
+			func() error { _, err := c.Disks.Get(context.Background(), id); return err },
+			func() error { _, err := c.Disks.Resize(context.Background(), id, 2); return err },
+			func() error { _, err := c.VDS.PowerOn(context.Background(), id); return err },
+		} {
+			if err := call(); err == nil {
+				t.Error("accepted invalid resource ID")
+			}
+		}
+	}
+}
+
 func TestConcurrentClient(t *testing.T) {
 	c := testClient(t, func(w http.ResponseWriter, r *http.Request) { _, _ = io.WriteString(w, `{"regions":[]}`) })
 	var wg sync.WaitGroup
