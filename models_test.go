@@ -79,3 +79,24 @@ func TestInvalidResponseScalars(t *testing.T) {
 		})
 	}
 }
+
+func TestRequestEncoding(t *testing.T) {
+	for _, tt := range []struct {
+		name string
+		req  any
+		want string
+	}{
+		{"standard optional password", hexcore.CreateVDSRequest{Name: "host", Size: "plan", Image: "image", Region: "region"},
+			`{"name":"host","size":"plan","image":"image","region":"region"}`},
+		{"custom password", hexcore.CreateCustomVDSRequest{Name: "host", Size: hexcore.CustomSize{VCPU: 2, Memory: 3, Disk: 13}, Image: "image", Region: "region", Password: "example"},
+			`{"name":"host","size":0,"custom_size":1,"custom_size_data":{"vcpu":2,"memory":3,"disk":13},"image":"image","region":"region","password":"example"}`},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := json.Marshal(tt.req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			equalJSON(t, string(data), tt.want)
+		})
+	}
+}
