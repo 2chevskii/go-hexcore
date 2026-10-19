@@ -28,11 +28,16 @@ vet, race tests, and coverage. It also validates workflow definitions and PR tit
 
 ## Pull requests
 
-Create a focused branch from `master`. Describe the problem, resulting behavior,
+Create a focused branch from `develop` and target your PR there. Use a branch
+such as `feature/name`, `fix/name`, or `docs/name`. Describe the problem, resulting behavior,
 and validation in the pull request template. Use a
 [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) PR title,
 such as `fix(client): preserve cancellation errors` or
 `docs: clarify disk cleanup`. Maintainers use PR titles when squash merging.
+Use `!` for breaking changes and explain the migration in the PR body. Preserve
+any `BREAKING CHANGE:` footer in the squash message. Direct pushes to `master`
+and `develop` are prohibited. Release and hotfix preparation follow
+[RELEASING.md](RELEASING.md); versioning starts at v1.0.0.
 
 Add regression coverage when behavior changes and update the relevant public
 documentation. Keep unrelated formatting and generated artifacts out of the PR.

@@ -14,6 +14,7 @@
 
 - [ ] The change is focused, with tests and documentation updated where needed.
 - [ ] The PR title follows Conventional Commits.
+- [ ] The PR targets `develop`, or follows the documented release/hotfix process.
 - [ ] Fixtures and diagnostics contain no credentials or private account data.
 - [ ] API changes cite documentation or sanitized observations, when applicable.
 - [ ] I agree to follow the [Code of Conduct](https://github.com/2chevskii/go-hexcore/blob/master/.github/CODE_OF_CONDUCT.md).
