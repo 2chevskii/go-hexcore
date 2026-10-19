@@ -1,0 +1,392 @@
+{
+  "get_account_information": {
+    "account": [
+      {
+        "id": "2",
+        "email": "support@hexcore.ru",
+        "status": "1",
+        "type": "2",
+        "balance": "250.00",
+        "referalClickCount": "0",
+        "referalRegCount": "0",
+        "discount": "0",
+        "create_date": "2015-07-06 22:49:09",
+        "configData": {
+          "address": "192012, САНКТ-ПЕТЕРБУРГ ГОРОД, ОБУХОВСКОЙ ОБОРОНЫ ПРОСПЕКТ, д. 2",
+          "inn": "78111111",
+          "ogrn": "1000000000",
+          "bankRs": "4070281234234234",
+          "bankBik": "044030858",
+          "bankName": "ПЕТЕРБУРГСКИЙ ФИЛИАЛ АО ЮНИКРЕДИТ БАНКА",
+          "bankKs": "3010181231231231231"
+        }
+      }
+    ]
+  },
+  "get_Action_ById": {
+    "actions": [
+      {
+        "id": "9",
+        "resource_id": "5681",
+        "resource_type": "vds",
+        "type": "reboot",
+        "date_started": "2019-02-19T13:08:53+03:00",
+        "date_completed": "2019-02-19T13:09:19+03:00",
+        "status": "completed",
+        "message": null
+      }
+    ]
+  },
+  "get_all_Actions": {
+    "actions": [
+      {
+        "id": "9",
+        "resource_id": "5681",
+        "resource_type": "vds",
+        "type": "reboot",
+        "date_started": "2019-02-19T13:08:53+03:00",
+        "date_completed": "2019-02-19T13:09:19+03:00",
+        "status": "completed",
+        "message": null
+      },
+      {
+        "id": "10",
+        "resource_id": "5681",
+        "resource_type": "vds",
+        "type": "shutodwn",
+        "date_started": "2019-02-19T13:08:53+03:00",
+        "date_completed": null,
+        "status": "in-progress",
+        "message": null
+      }
+    ]
+  },
+  "get_Disk_ById": {
+    "disk": [
+      {
+        "id": "36",
+        "name": "vhdtest1",
+        "region": "RU-SPB-4",
+        "size": "1",
+        "price": "3.00",
+        "created_date": "2024-02-01 18:04:01",
+        "next_bill_date": "2024-03-01",
+        "status": {
+          "vdsId": 8877,
+          "status": "plugged"
+        }
+      }
+    ]
+  },
+  "create_new_Disk": {
+    "disk": [
+      {
+        "id": "24536",
+        "name": "new-disk-name",
+        "size": "5",
+        "created": "2024-07-12 13:45:12",
+        "next_bill_date": "2024-08-12",
+        "vds_id": 1782
+      }
+    ]
+  },
+  "get_all_Disks": {
+    "disk": [
+      {
+        "id": "36",
+        "name": "vhd1",
+        "region": "RU-SPB-4",
+        "size": "1",
+        "price": "2.00",
+        "created_date": "2023-09-01 18:04:01",
+        "next_bill_date": "2023-10-01",
+        "status": {
+          "vds_id": 136,
+          "status": "plugged"
+        }
+      },
+      {
+        "id": "37",
+        "name": "vhd2",
+        "region": "RU-MSK-4",
+        "size": "10",
+        "price": "30.00",
+        "created_date": "2024-02-01 18:04:01",
+        "next_bill_date": "2024-03-01",
+        "status": {
+          "vds_id": 378,
+          "status": "not_attached"
+        }
+      },
+      {
+        "id": "38",
+        "name": "vhd3",
+        "region": "RU-SPB-10",
+        "size": "100",
+        "price": "300.00",
+        "created_date": "2024-03-11 21:10:00",
+        "next_bill_date": "2024-04-11",
+        "status": {
+          "vds_id": 1429,
+          "status": "unplugged"
+        }
+      }
+    ]
+  },
+  "plug_Disk": {
+    "action": [
+      {
+        "id": "185160",
+        "status": "in-progress",
+        "type": "plug",
+        "started_at": "2024-05-14T16:45:01Z",
+        "completed_at": null,
+        "resource_id": 5749,
+        "resource_type": "disk"
+      }
+    ]
+  },
+  "unplug_Disk": {
+    "action": [
+      {
+        "id": "185160",
+        "status": "in-progress",
+        "type": "plug",
+        "started_at": "2024-05-14T16:45:01Z",
+        "completed_at": null,
+        "resource_id": 4536,
+        "resource_type": "disk"
+      }
+    ]
+  },
+  "resize_Disk": {
+    "action": [
+      {
+        "id": "185276",
+        "status": "in-progress",
+        "type": "resize",
+        "started_at": "2024-05-14T16:45:01Z",
+        "completed_at": null,
+        "resource_id": 7852,
+        "resource_type": "disk"
+      }
+    ]
+  },
+  "create_new_Vds": {
+    "vds": [
+      {
+        "id": "24536",
+        "name": "example.com",
+        "memory": "1024",
+        "vcpu": "1",
+        "disk": "10",
+        "created": "2018-06-01 12:32:10",
+        "next_bill_date": "2018-07-01"
+      }
+    ]
+  },
+  "create_new_custom_Vds": {
+    "vds": [
+      {
+        "id": "24536",
+        "name": "example.com",
+        "memory": "3072",
+        "vcpu": "1",
+        "disk": "13",
+        "created": "2018-06-01 12:32:10",
+        "next_bill_date": "2018-07-01"
+      }
+    ]
+  },
+  "list_Vds": {
+    "vds": [
+      {
+        "id": "111",
+        "name": "Terminal",
+        "vcpu": "2",
+        "memory": "4096",
+        "disk": "30",
+        "ipv4": "1.1.1.1",
+        "status": "Running",
+        "price": "1900.00",
+        "region": "EE-TLL-1",
+        "next_bill_date": "2018-01-27"
+      },
+      {
+        "id": "333",
+        "name": "blog",
+        "vcpu": "2",
+        "memory": "2048",
+        "disk": "30",
+        "ipv4": "2.2.2.2",
+        "status": "Running",
+        "price": "1000.00",
+        "region": "EE-TLL-3",
+        "next_bill_date": "2018-02-08"
+      }
+    ]
+  },
+  "get_Vds_ById": {
+    "vds": [
+      {
+        "id": "254617",
+        "name": "Terminal",
+        "vcpu": "2",
+        "memory": "4096",
+        "ipv4": "85.143.202.123",
+        "disk": "30",
+        "price": "1900.00",
+        "next_bill_date": "2018-01-27"
+      }
+    ]
+  },
+  "reboot_Vds": {
+    "action": [
+      {
+        "id": "184057",
+        "status": "in-progress",
+        "type": "reboot",
+        "started_at": "2018-11-14T16:31:00Z",
+        "completed_at": null,
+        "resource_id": 3164450,
+        "resource_type": "vds"
+      }
+    ]
+  },
+  "hard_reboot_Vds": {
+    "action": [
+      {
+        "id": "184159",
+        "status": "in-progress",
+        "type": "hard_reboot",
+        "started_at": "2018-11-14T16:31:00Z",
+        "completed_at": null,
+        "resource_id": 3164450,
+        "resource_type": "vds"
+      }
+    ]
+  },
+  "shutdown_Vds": {
+    "action": [
+      {
+        "id": "184957",
+        "status": "in-progress",
+        "type": "shutdown",
+        "started_at": "2018-11-14T16:31:00Z",
+        "completed_at": null,
+        "resource_id": 3164450,
+        "resource_type": "vds"
+      }
+    ]
+  },
+  "hard_shutdown_Vds": {
+    "action": [
+      {
+        "id": "170239",
+        "status": "in-progress",
+        "type": "hard_shutdown",
+        "started_at": "2018-11-14T16:31:00Z",
+        "completed_at": null,
+        "resource_id": 3164450,
+        "resource_type": "vds"
+      }
+    ]
+  },
+  "power_on_Vds": {
+    "action": [
+      {
+        "id": "146539",
+        "status": "in-progress",
+        "type": "power_on",
+        "started_at": "2018-11-14T16:31:00Z",
+        "completed_at": null,
+        "resource_id": 3164450,
+        "resource_type": "vds"
+      }
+    ]
+  },
+  "destroy_Vds": null,
+  "reset_password_Vds": {
+    "action": [
+      {
+        "id": "1356266",
+        "status": "in-progress",
+        "type": "reset_password",
+        "started_at": "2018-11-14T16:31:00Z",
+        "completed_at": null,
+        "resource_id": 3164450,
+        "resource_type": "vds"
+      }
+    ]
+  },
+  "list_regions": {
+    "regions": [
+      {
+        "name": "ru-4",
+        "slug": "ru-spb-4",
+        "available": true
+      },
+      {
+        "name": "ru-5",
+        "slug": "ru-msk-1",
+        "available": true
+      }
+    ]
+  },
+  "list_sizes": {
+    "sizes": [
+      {
+        "slug": "1vcpu-1gb-15disk",
+        "cpu": "1",
+        "ram": "1024",
+        "disk": "15",
+        "monthPrice": "250",
+        "hourPrice": "0.34"
+      },
+      {
+        "slug": "2vcpu-2gb-20disk",
+        "cpu": "2",
+        "ram": "2048",
+        "disk": "20",
+        "monthPrice": "500",
+        "hourPrice": "0.68"
+      }
+    ]
+  },
+  "list_images": {
+    "images": [
+      {
+        "id": "1",
+        "name": "Debian",
+        "version": "8",
+        "slug": "debian_8",
+        "min_disk_size": "10"
+      },
+      {
+        "id": "2",
+        "name": "Ubuntu",
+        "version": "16.04",
+        "slug": "debian_16.04",
+        "min_disk_size": "10"
+      }
+    ]
+  },
+  "list_applications": {
+    "applications": [
+      {
+        "id": "23",
+        "name": "VestaCP",
+        "version": "1",
+        "slug": "vestacp",
+        "min_disk_size": "10"
+      },
+      {
+        "id": "24",
+        "name": "LAMP",
+        "version": "1",
+        "slug": "lamp",
+        "min_disk_size": "10"
+      }
+    ]
+  }
+}
