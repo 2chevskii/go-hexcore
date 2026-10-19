@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [master, develop]
   pull_request:
     types: [opened, synchronize, reopened, edited, ready_for_review]
 
@@ -39,6 +39,14 @@ jobs:
           go-version: stable
           check-latest: true
           cache-dependency-path: go.mod
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Test release automation offline
+        run: node --test .github/scripts/*.test.mjs
 
       - name: Check formatting
         run: |
@@ -118,28 +126,30 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  pr-title:
-    name: Conventional Commit PR title
+  pr-policy:
+    name: PR branch and release policy
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Validate title
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          node <<'NODE'
-          const pattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^()\r\n]+\))?!?: \S.*$/;
-          if (!pattern.test(process.env.PR_TITLE || '')) {
-            console.error('Use a Conventional Commit title, for example: fix(client): preserve cancellation errors');
-            process.exit(1);
-          }
-          NODE
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Validate PR title, branch, and release metadata
+        run: node .github/scripts/release-workflow.mjs check-pr
 
   ci:
     name: CI
     if: ${{ always() }}
-    needs: [quality, tests, pr-title]
+    needs: [quality, tests, pr-policy]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -147,13 +157,13 @@ jobs:
         env:
           QUALITY_RESULT: ${{ needs.quality.result }}
           TEST_RESULT: ${{ needs.tests.result }}
-          TITLE_RESULT: ${{ needs.pr-title.result }}
+          POLICY_RESULT: ${{ needs.pr-policy.result }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
           [[ "$QUALITY_RESULT" == "success" ]]
           [[ "$TEST_RESULT" == "success" ]]
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            [[ "$TITLE_RESULT" == "success" ]]
+            [[ "$POLICY_RESULT" == "success" ]]
           else
-            [[ "$TITLE_RESULT" == "skipped" ]]
+            [[ "$POLICY_RESULT" == "skipped" ]]
           fi

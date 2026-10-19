@@ -1,0 +1,67 @@
+name: Publish release
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Full master merge SHA to recover; empty selects current master'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-management
+  cancel-in-progress: false
+
+env:
+  GOTOOLCHAIN: local
+  HEXCORE_LIVE: '0'
+  HEXCORE_LIVE_WRITES: '0'
+
+jobs:
+  publish:
+    name: Publish reviewed master commit
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+    steps:
+      # Privileged workflow_run jobs use only default-branch tooling. No code or
+      # artifacts from the triggering workflow are executed here.
+      - name: Checkout trusted release tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: develop
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          check-latest: true
+          cache-dependency-path: go.mod
+
+      - name: Validate, tag, publish, and open synchronization PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ inputs.commit }}
+        run: node .github/scripts/release-workflow.mjs publish
