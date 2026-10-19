@@ -60,9 +60,8 @@ export class GitHub {
       requireThat(existing[0].title === title, 'Existing PR title differs from the generated title.');
       return existing[0];
     }
-    // A previously closed candidate is not silently reopened or released.
-    const closed = await this.api(`pulls?${new URLSearchParams({ state: 'closed', head: `${owner}:${branch}`, base })}`);
-    requireThat(closed.length === 0, `A closed PR already uses ${branch}; resolve or delete the stale candidate first.`);
+    // A superseded candidate may have used the same version branch name.
+    // Create a fresh PR rather than reopening an old review of another SHA.
     return this.api('pulls', { method: 'POST', body: { head: branch, base, title, body } });
   }
 }

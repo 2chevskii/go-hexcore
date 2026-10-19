@@ -315,3 +315,14 @@ test('GitHub API handles optional missing resources and does not treat errors as
   const denied = new GitHub(repository, 'test-token', async () => response(403));
   await assert.rejects(denied.api('git/ref/tags/v1.0.0', { optional: true }), /HTTP 403/);
 });
+
+test('a fresh candidate can use a version branch name previously used by a closed PR', async () => {
+  const github = new GitHub(repository, 'test-token', async (url, options) => {
+    if (options.method === 'POST') return { status: 201, ok: true,
+      json: async () => ({ number: 2, html_url: 'https://example.invalid/new-release-pr' }) };
+    const oldReview = new URL(url).searchParams.get('state') === 'closed';
+    return { status: 200, ok: true, json: async () => oldReview ? [{ number: 1 }] : [] };
+  });
+  const result = await github.ensurePR('release/v1.1.0', 'master', 'chore(release): v1.1.0', 'Fresh candidate');
+  assert.equal(result.number, 2);
+});
