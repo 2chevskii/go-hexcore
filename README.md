@@ -17,6 +17,10 @@ not established. See the
 go get github.com/2chevskii/go-hexcore
 ```
 
+Normal contributions target `develop`; `master` contains released code. Releases
+start at v1.0.0 and follow Semantic Versioning. See the
+[release process](.github/RELEASING.md) and [changelog](CHANGELOG.md).
+
 ## Usage
 
 ```go
