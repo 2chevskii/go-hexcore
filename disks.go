@@ -10,7 +10,7 @@ import (
 type DisksService struct{ client *Client }
 
 // CreateDiskRequest selects a disk size in GB and deployment region by slug.
-// VDSID optionally attaches the disk during creation. If supplied, it must be a
+// VDSID optionally requests attachment during creation. If supplied, it must be a
 // positive decimal ID and is encoded as a JSON number without precision loss.
 type CreateDiskRequest struct {
 	Name   string  `json:"name"`
@@ -65,7 +65,7 @@ func (s *DisksService) action(ctx context.Context, id, kind string, size *int64)
 		Type string `json:"type"`
 		Size *int64 `json:"size,omitempty"`
 	}{Type: kind, Size: size}
-	return requestOne[Action](ctx, s.client, http.MethodPost, path, req, http.StatusOK, "action")
+	return requestOne[Action](ctx, s.client, http.MethodPost, path, req, http.StatusOK, "action", http.StatusAccepted)
 }
 
 // Plug submits the documented plug action. The documentation provides no

@@ -19,9 +19,9 @@ type CreateVDSRequest struct {
 	Password string `json:"password,omitempty"`
 }
 
-// CustomSize contains raw API quantities for custom VDS creation. Memory is
-// sent unchanged: the documentation's example uses 3 to obtain 3072 MB, but
-// the request unit has not yet been verified against the live API. Disk is GB.
+// CustomSize contains quantities for custom VDS creation. Memory and Disk are
+// in GB. The API reports VDS.Memory in MB (1024 per requested GB). Quantities
+// are sent unchanged.
 type CustomSize struct {
 	VCPU   int64 `json:"vcpu"`
 	Memory int64 `json:"memory"`
@@ -83,7 +83,7 @@ func (s *VDSService) action(ctx context.Context, id, kind string, password *stri
 	if err != nil {
 		return nil, err
 	}
-	return requestOne[Action](ctx, s.client, http.MethodPost, path, actionRequest{Type: kind, Password: password}, http.StatusOK, "action")
+	return requestOne[Action](ctx, s.client, http.MethodPost, path, actionRequest{Type: kind, Password: password}, http.StatusOK, "action", http.StatusAccepted)
 }
 
 // Reboot requests a graceful reboot and returns the accepted action.
@@ -116,12 +116,12 @@ func (s *VDSService) ResetPassword(ctx context.Context, id, password string) (*A
 	return s.action(ctx, id, "reset_password", &password)
 }
 
-// Destroy requests destruction. The documented response has no action or body;
-// a nil error is HTTP acceptance, not a separate readiness or deletion check.
+// Destroy requests destruction of an already halted VDS. Both 204 and 202
+// acknowledgements are accepted. The caller owns shutdown and deletion polling.
 func (s *VDSService) Destroy(ctx context.Context, id string) error {
 	path, err := resourcePath("vds", id, "/action")
 	if err != nil {
 		return err
 	}
-	return s.client.do(ctx, http.MethodPost, path, actionRequest{Type: "destroy"}, http.StatusNoContent, nil)
+	return s.client.do(ctx, http.MethodPost, path, actionRequest{Type: "destroy"}, http.StatusNoContent, nil, http.StatusAccepted)
 }
