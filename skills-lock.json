@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "go-expert": {
+      "source": "personamanagmentlayer/pcl",
+      "sourceType": "github",
+      "skillPath": "stdlib/languages/go-expert/SKILL.md",
+      "computedHash": "70f6915809de49192da27f66e06fd39a96d676128d325c3ce96f1a22c0efc405"
+    }
+  }
+}

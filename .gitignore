@@ -1,0 +1,6 @@
+# Local credentials and generated test artifacts.
+.env
+.env.*
+*.test
+*.test.exe
+coverage.out
