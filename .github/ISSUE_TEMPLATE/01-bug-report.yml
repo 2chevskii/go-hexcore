@@ -1,0 +1,59 @@
+name: Bug report
+description: Report reproducible unexpected behavior in go-hexcore.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove tokens, passwords, account details, and real resource identifiers before submitting.
+        For vulnerabilities, follow the security policy instead of opening a public issue.
+  - type: input
+    id: module-version
+    attributes:
+      label: go-hexcore version or commit
+      description: Include the module version, pseudo-version, or commit SHA.
+    validations:
+      required: true
+  - type: input
+    id: go-version
+    attributes:
+      label: Go version
+      description: Paste the output of go version.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system and architecture
+      placeholder: linux/amd64
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Provide a small Go example or steps that reproduce the problem. Use synthetic data.
+      render: go
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include sanitized errors and HTTP status codes. Distinguish live API calls from local tests.
+    validations:
+      required: true
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct.
+          required: true

@@ -1,5 +1,8 @@
 # go-hexcore
 
+[![CI](https://github.com/2chevskii/go-hexcore/actions/workflows/ci.yml/badge.svg)](https://github.com/2chevskii/go-hexcore/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A Go 1.22+ client for the [HexCore HTTP API](https://dev.hexcore.ru/), intended
 for use by a future Terraform provider. It uses only the Go standard library.
 
@@ -13,8 +16,6 @@ not established. See the
 ```sh
 go get github.com/2chevskii/go-hexcore
 ```
-
-Access to the private GitHub repository is required to fetch the module.
 
 ## Usage
 
@@ -269,3 +270,17 @@ in progress after separate ten-minute checks on fresh fixtures. Disk attachment
 and subsequent disk actions are blocked by `Can not get Disk status.`; one
 inspected disk also had a missing control-panel UUID. These findings do not
 establish that all acknowledged writes complete successfully.
+
+## Contributing and support
+
+Read the [contribution guide](.github/CONTRIBUTING.md) before opening a pull
+request. Use [Discussions](https://github.com/2chevskii/go-hexcore/discussions)
+for questions and the [issue templates](https://github.com/2chevskii/go-hexcore/issues/new/choose)
+for bugs, feature requests, and documentation improvements. See the
+[security policy](.github/SECURITY.md) for private vulnerability reporting.
+
+## License
+
+This library is available under the [MIT License](LICENSE).
+The bundled [Go development skill](.agents/skills/go-expert/NOTICE) retains its
+upstream [Apache License 2.0](.agents/skills/go-expert/LICENSE).
