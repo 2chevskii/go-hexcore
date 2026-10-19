@@ -1,0 +1,38 @@
+{
+  "account_object": {
+    "status": 200,
+    "body": {
+      "account": {
+        "id": "123",
+        "email": "account@example.invalid",
+        "status": "1",
+        "templatePriceGroup": "1",
+        "type": "1",
+        "balance": "12.34",
+        "currency": "RUB",
+        "referalClickCount": "0",
+        "referalRegCount": "0",
+        "discount": "0",
+        "create_date": "2000-01-01 00:00:00",
+        "configData": null,
+        "apiTokenType": "2"
+      }
+    }
+  },
+  "empty_actions": {
+    "status": 403,
+    "body": {
+      "actions": {
+        "message": "No actions found."
+      }
+    }
+  },
+  "empty_disks": {
+    "status": 403,
+    "body": {
+      "disk": {
+        "message": "Can not find disk for your account."
+      }
+    }
+  }
+}
