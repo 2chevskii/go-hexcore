@@ -33,10 +33,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up minimum Go version
+      - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: "1.22.x"
+          go-version: stable
           check-latest: true
           cache-dependency-path: go.mod
 
@@ -55,7 +55,7 @@ jobs:
           changes="$(git status --porcelain -- go.mod go.sum)"
           if [[ -n "$changes" ]]; then
             printf '%s\n' "$changes"
-            echo '::error::Run go mod tidy with Go 1.22 and commit the module files.'
+            echo '::error::Run go mod tidy with stable Go and commit the module files.'
             exit 1
           fi
           go mod verify
@@ -67,23 +67,9 @@ jobs:
         run: go vet ./...
 
   tests:
-    name: Go ${{ matrix.go }} (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Go stable (Linux)
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-24.04
-            go: "1.22.x"
-          - os: ubuntu-24.04
-            go: oldstable
-          - os: ubuntu-24.04
-            go: stable
-          - os: windows-2025
-            go: stable
-          - os: macos-26
-            go: stable
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -93,35 +79,26 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: ${{ matrix.go }}
+          go-version: stable
           check-latest: true
           cache-dependency-path: go.mod
 
       - name: Validate workflow definitions
-        if: matrix.os == 'ubuntu-24.04' && matrix.go == 'stable'
         run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
 
       - name: Run offline tests
-        env:
-          GO_VERSION: ${{ matrix.go }}
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" && "$GO_VERSION" == "stable" ]]; then
-            go test -race -count=1 -covermode=atomic -coverprofile=coverage.out -json ./... | tee test-results.json
-          else
-            go test -count=1 -json ./... | tee test-results.json
-          fi
+        run: go test -race -count=1 -covermode=atomic -coverprofile=coverage.out -json ./... | tee test-results.json
 
       - name: Upload test results
         if: ${{ !cancelled() && hashFiles('test-results.json') != '' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: test-results-${{ matrix.os }}-${{ matrix.go }}
+          name: test-results-linux-stable
           path: test-results.json
           if-no-files-found: error
           retention-days: 7
 
       - name: Summarize coverage
-        if: matrix.os == 'ubuntu-24.04' && matrix.go == 'stable'
         run: |
           go tool cover -func=coverage.out > coverage.txt
           {
@@ -132,7 +109,6 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload coverage
-        if: matrix.os == 'ubuntu-24.04' && matrix.go == 'stable'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage

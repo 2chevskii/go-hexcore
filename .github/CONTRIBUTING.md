@@ -23,9 +23,8 @@ go test -race -count=1 ./...
 Race detection requires CGO and a supported C compiler. Note in your PR if your
 local environment cannot run it; CI runs race checks on Linux.
 
-CI checks formatting and module consistency with Go 1.22, tests Go 1.22 and the
-two currently supported Go releases on Linux, and tests current stable Go on
-Windows and macOS. It also validates workflow definitions and PR titles.
+CI uses current stable Go on Linux for formatting, module consistency, build,
+vet, race tests, and coverage. It also validates workflow definitions and PR titles.
 
 ## Pull requests
 
