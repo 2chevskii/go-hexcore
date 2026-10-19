@@ -32,6 +32,7 @@ func TestResponseRepresentations(t *testing.T) {
 		{"disk schema aliases", `{"id":1,"status":"plugged","vdsId":"42","nex_bill_date":"date"}`,
 			&hexcore.Disk{ID: "1", Status: ptr("plugged"), VDSID: ptr("42"), NextBillDate: "date"}},
 		{"disk null attachment", `{"id":1,"status":null,"vds_id":null}`, &hexcore.Disk{ID: "1"}},
+		{"disk absent attachment record", `{"id":1,"status":{"status":null,"vdsId":null}}`, &hexcore.Disk{ID: "1"}},
 		{"disk top-level attachment alias", `{"id":1,"vdsId":42,"status":{"status":"plugged"}}`, &hexcore.Disk{ID: "1", VDSID: ptr("42"), Status: ptr("plugged")}},
 		{"size schema aliases", `{"slug":"plan","vcpu":"2","ram":1024,"disk":"15","month_price":250.00,"hour_price":"0.34"}`,
 			&hexcore.Size{Slug: "plan", VCPU: 2, Memory: 1024, Disk: 15, MonthPrice: "250.00", HourPrice: "0.34"}},

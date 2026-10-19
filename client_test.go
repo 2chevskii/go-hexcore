@@ -56,6 +56,10 @@ func TestAPIErrorsAndNoRetries(t *testing.T) {
 	}{
 		{"unauthorized", `{"message":"Invalid token"}`, "Invalid token", 401},
 		{"forbidden", `{"message":"Missing or inaccessible"}`, "Missing or inaccessible", 403},
+		{"resource envelope", `{"vds":{"message":"Action not allowed."}}`, "Action not allowed.", 403},
+		{"top-level message wins", `{"message":"Access denied.","vds":{"message":"Other detail."}}`, "Access denied.", 403},
+		{"unrelated envelope", `{"disk":{"message":"Disk detail."}}`, "Forbidden", 403},
+		{"invalid nested message", `{"vds":{"message":{}}}`, "Forbidden", 403},
 		{"not found", ``, "Not Found", 404},
 		{"throttled", `{"message":"Try later"}`, "Try later", 429},
 		{"HTML", `<h1>Unavailable</h1>`, "Service Unavailable", 503},

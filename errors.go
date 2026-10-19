@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // APIError describes an unexpected HTTP status. Headers includes Retry-After
@@ -35,11 +36,21 @@ func readAPIError(res *http.Response, method, path string) *APIError {
 	data, err := io.ReadAll(io.LimitReader(res.Body, 64<<10))
 	e.cause = err
 	if err == nil {
-		var body struct {
+		var message struct {
 			Message string `json:"message"`
 		}
-		if json.Unmarshal(data, &body) == nil && body.Message != "" {
-			e.Message = body.Message
+		if json.Unmarshal(data, &message) == nil && message.Message != "" {
+			e.Message = message.Message
+		} else {
+			// Live errors can be wrapped under the resource key, for example
+			// {"actions":{"message":"No actions found."}}. Restrict lookup
+			// to the requested resource rather than arbitrary nested objects.
+			key := strings.Split(strings.TrimPrefix(path, "/"), "/")[0]
+			key = strings.TrimSuffix(key, "_list")
+			var envelope map[string]json.RawMessage
+			if json.Unmarshal(data, &envelope) == nil && json.Unmarshal(envelope[key], &message) == nil && message.Message != "" {
+				e.Message = message.Message
+			}
 		}
 	}
 	return e

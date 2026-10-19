@@ -77,7 +77,7 @@ func NewClient(cfg Config) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) do(ctx context.Context, method, path string, body any, status int, out any) error {
+func (c *Client) do(ctx context.Context, method, path string, body any, status int, out any, alternateStatuses ...int) error {
 	var payload io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
@@ -99,7 +99,11 @@ func (c *Client) do(ctx context.Context, method, path string, body any, status i
 		return fmt.Errorf("hexcore: %s %s: %w", method, path, err)
 	}
 	defer res.Body.Close()
-	if res.StatusCode != status {
+	accepted := res.StatusCode == status
+	for _, alternate := range alternateStatuses {
+		accepted = accepted || res.StatusCode == alternate
+	}
+	if !accepted {
 		return readAPIError(res, method, path)
 	}
 	if out == nil {
@@ -128,7 +132,11 @@ func requestList[T any](ctx context.Context, c *Client, method, path string, bod
 	if err := c.do(ctx, method, path, body, status, &envelope); err != nil {
 		return nil, err
 	}
-	raw := bytes.TrimSpace(envelope[key])
+	return decodeList[T](method, path, key, envelope[key])
+}
+
+func decodeList[T any](method, path, key string, data json.RawMessage) ([]T, error) {
+	raw := bytes.TrimSpace(data)
 	if len(raw) == 0 || raw[0] != '[' {
 		return nil, fmt.Errorf("hexcore: decode %s %s: expected %q array", method, path, key)
 	}
@@ -148,8 +156,22 @@ func requestList[T any](ctx context.Context, c *Client, method, path string, bod
 	return result, nil
 }
 
-func requestOne[T any](ctx context.Context, c *Client, method, path string, body any, status int, key string) (*T, error) {
-	items, err := requestList[T](ctx, c, method, path, body, status, key)
+func requestOne[T any](ctx context.Context, c *Client, method, path string, body any, status int, key string, alternateStatuses ...int) (*T, error) {
+	var envelope map[string]json.RawMessage
+	if err := c.do(ctx, method, path, body, status, &envelope, alternateStatuses...); err != nil {
+		return nil, err
+	}
+	raw := bytes.TrimSpace(envelope[key])
+	// Live account responses contain an object, while the documentation shows
+	// an array. Both forms represent the same singular resource.
+	if len(raw) > 0 && raw[0] == '{' {
+		var item T
+		if err := json.Unmarshal(raw, &item); err != nil {
+			return nil, fmt.Errorf("hexcore: decode %s %s: %w", method, path, err)
+		}
+		return &item, nil
+	}
+	items, err := decodeList[T](method, path, key, raw)
 	if err != nil {
 		return nil, err
 	}

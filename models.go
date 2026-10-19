@@ -13,6 +13,7 @@ type Account struct {
 	Status                    int64          `json:"status"`
 	Type                      int64          `json:"type"`
 	Balance                   string         `json:"balance"`
+	Currency                  string         `json:"currency"`
 	ReferralClickCount        int64          `json:"referalClickCount"`
 	ReferralRegistrationCount int64          `json:"referalRegCount"`
 	Discount                  string         `json:"discount"`
