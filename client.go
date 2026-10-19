@@ -31,6 +31,7 @@ type Config struct {
 type Client struct {
 	Account      *AccountService
 	VDS          *VDSService
+	Disks        *DisksService
 	Regions      *RegionsService
 	Sizes        *SizesService
 	Images       *ImagesService
@@ -66,6 +67,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c := &Client{token: cfg.Token, baseURL: strings.TrimRight(u.String(), "/"), http: cfg.HTTPClient, userAgent: cfg.UserAgent}
 	c.Account = &AccountService{c}
 	c.VDS = &VDSService{c}
+	c.Disks = &DisksService{c}
 	c.Regions = &RegionsService{c}
 	c.Sizes = &SizesService{c}
 	c.Images = &ImagesService{c}

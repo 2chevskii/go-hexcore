@@ -3,6 +3,7 @@ package hexcore_test
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 
 	hexcore "github.com/2chevskii/go-hexcore"
@@ -90,6 +91,10 @@ func TestRequestEncoding(t *testing.T) {
 			`{"name":"host","size":"plan","image":"image","region":"region"}`},
 		{"custom password", hexcore.CreateCustomVDSRequest{Name: "host", Size: hexcore.CustomSize{VCPU: 2, Memory: 3, Disk: 13}, Image: "image", Region: "region", Password: "example"},
 			`{"name":"host","size":0,"custom_size":1,"custom_size_data":{"vcpu":2,"memory":3,"disk":13},"image":"image","region":"region","password":"example"}`},
+		{"unattached disk", hexcore.CreateDiskRequest{Name: "disk", Size: 5, Region: "region"}, `{"name":"disk","size":5,"region":"region"}`},
+		{"exact disk attachment ID", hexcore.CreateDiskRequest{Name: "disk", Size: 5, Region: "region", VDSID: ptr("9007199254740993")},
+			`{"name":"disk","size":5,"region":"region","vds_id":9007199254740993}`},
+		{"leading zeros", hexcore.CreateDiskRequest{VDSID: ptr("00012")}, `{"name":"","size":0,"region":"","vds_id":12}`},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			data, err := json.Marshal(tt.req)
@@ -98,5 +103,12 @@ func TestRequestEncoding(t *testing.T) {
 			}
 			equalJSON(t, string(data), tt.want)
 		})
+	}
+	for _, id := range []string{"", "0", "0000", "-1", "1.5", "1e3", " 1", "not-a-number"} {
+		if _, err := json.Marshal(hexcore.CreateDiskRequest{VDSID: &id}); err == nil {
+			t.Errorf("accepted invalid numeric attachment ID %q", id)
+		} else if strings.Contains(err.Error(), id) && id == "not-a-number" {
+			t.Error("encoding error included request data")
+		}
 	}
 }

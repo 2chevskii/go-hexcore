@@ -216,3 +216,23 @@ func TestPasswordResetIncludesRequiredPassword(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestRequestConstructionFailures(t *testing.T) {
+	var calls atomic.Int32
+	c, err := hexcore.NewClient(hexcore.Config{Token: "test", HTTPClient: &http.Client{Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
+		calls.Add(1)
+		return nil, errors.New("unexpected HTTP request")
+	})}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := c.Disks.Create(context.Background(), hexcore.CreateDiskRequest{VDSID: ptr("invalid")}); err == nil {
+		t.Error("invalid request encoded successfully")
+	}
+	if _, err := c.Account.Get(nil); err == nil {
+		t.Error("accepted a nil context")
+	}
+	if calls.Load() != 0 {
+		t.Fatal("invalid request reached the transport")
+	}
+}
