@@ -1,15 +1,27 @@
-# Contributing to go-hexcore
+# Contributing
 
-Read the [README](../README.md), [live verification report](../docs/live-verification.md),
-and [Code of Conduct](CODE_OF_CONDUCT.md) before contributing. Search existing
-[issues](https://github.com/2chevskii/go-hexcore/issues) and
-[discussions](https://github.com/2chevskii/go-hexcore/discussions) before opening one.
-Report vulnerabilities through [SECURITY.md](SECURITY.md).
+Open normal pull requests against `develop`. Check existing
+[issues](https://github.com/2chevskii/go-hexcore/issues) before starting work.
+Follow the [Code of Conduct](CODE_OF_CONDUCT.md); use the
+[security policy](SECURITY.md) for private vulnerability reports.
 
-## Development
+## Run the checks
 
-Use Go 1.22 or later. The library uses only the standard library. The default
-tests use local HTTP servers and fixtures; they require no HexCore credentials.
+Use Go 1.22+. The default tests use local HTTP servers and need no credentials.
+Disable live tests if they were enabled in your shell:
+
+Bash:
+
+```sh
+export HEXCORE_LIVE=0 HEXCORE_LIVE_WRITES=0
+```
+
+PowerShell:
+
+```powershell
+$env:HEXCORE_LIVE = '0'
+$env:HEXCORE_LIVE_WRITES = '0'
+```
 
 ```sh
 go fmt ./...
@@ -20,44 +32,61 @@ go test -count=1 ./...
 go test -race -count=1 ./...
 ```
 
-Race detection requires CGO and a supported C compiler. Note in your PR if your
-local environment cannot run it; CI runs race checks on Linux.
+Race checks need CGO and a C compiler. CI runs them on Linux; mention in your PR
+if you could not run them locally.
 
-CI uses current stable Go on Linux for formatting, module consistency, build,
-vet, race tests, and coverage. It also validates workflow definitions and PR titles.
+For changes to workflows or release scripts, also run these with Node 24:
 
-## Pull requests
+```sh
+node --test .github/scripts/*.test.mjs
+actionlint
+```
 
-Create a focused branch from `develop` and target your PR there. Use a branch
-such as `feature/name`, `fix/name`, or `docs/name`. Describe the problem, resulting behavior,
-and validation in the pull request template. Use a
-[Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/) PR title,
-such as `fix(client): preserve cancellation errors` or
-`docs: clarify disk cleanup`. Maintainers use PR titles when squash merging.
-Use `!` for breaking changes and explain the migration in the PR body. Preserve
-any `BREAKING CHANGE:` footer in the squash message. Direct pushes to `master`
-and `develop` are prohibited. Release and hotfix preparation follow
-[RELEASING.md](RELEASING.md); versioning starts at v1.0.0.
+## Write a pull request
 
-Add regression coverage when behavior changes and update the relevant public
-documentation. Keep unrelated formatting and generated artifacts out of the PR.
+Use a focused branch such as `fix/cancellation` or `docs/examples`.
+Give the PR a Conventional Commit title, for example
+`fix(client): preserve cancellation errors`. For breaking changes, add `!` and
+explain the migration. Keep any `BREAKING CHANGE:` footer in the squash message.
 
-For API changes, cite the relevant [HexCore API documentation](https://dev.hexcore.ru/)
-and explain any difference between the documented and observed behavior. Use
-synthetic or sanitized fixtures. Preserve context cancellation, explicit HTTP
-errors, and the client's lack of implicit retries and resource orchestration.
+Describe the change and how you checked it. Add tests for behavior changes and
+update the affected docs. For API changes, link the
+[HexCore documentation](https://dev.hexcore.ru/) or include sanitized responses.
+Keep explicit errors, context cancellation, and caller-controlled waiting and
+retries intact.
 
-## Live API checks
+Normal PRs are squash-merged into `develop`. Release, hotfix, and synchronization
+PRs follow [Releasing](RELEASING.md). Direct pushes to `develop` and `master`
+are prohibited.
 
-Live tests are optional and are excluded from CI. Follow the README's instructions
-only when you have a suitable account and permission to use its resources.
-Provisioning tests spend account funds, and disk cleanup requires the control
-panel. Check the live verification report for unresolved provider behavior first.
+## Edit the docs
 
-Never commit `.env`, tokens, passwords, account data, or unsanitized responses.
-Remove resource identifiers and personal data from new fixtures and issue reports.
-Describe live checks separately from offline results; mock tests do not establish
-live API compatibility.
+Use Node 24 and npm from the repository root:
 
-By contributing, you agree that your contributions are licensed under the
-repository's [MIT License](../LICENSE).
+```sh
+npm ci
+npm run docs:dev
+```
+
+Before opening a PR, build and preview:
+
+```sh
+npm run docs:build
+npm run docs:preview
+```
+
+Open `http://localhost:4173/go-hexcore/`. The build checks internal links.
+Check navigation, search, code copying, and light/dark appearance on desktop
+and mobile.
+
+Keep Go examples in `docs/examples/` and include the relevant regions in
+Markdown. `go test ./...` compiles these sources without running the examples.
+Do not commit dependencies, cache, or generated site output.
+
+## Test against HexCore
+
+Follow [Live checks](LIVE_CHECKS.md) only with permission to use the account.
+Writes cost money, and disk cleanup requires the control panel. Keep credentials,
+passwords, and account data out of commits, fixtures, and issue reports.
+
+Contributions are licensed under the [MIT License](../LICENSE).

@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "stdlib/languages/go-expert/SKILL.md",
       "computedHash": "70f6915809de49192da27f66e06fd39a96d676128d325c3ce96f1a22c0efc405"
+    },
+    "vitepress": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vitepress/SKILL.md",
+      "computedHash": "b7fd97083e6b963b478b430552861cf1514f39b8e3e7fdf0a348e86d76ecf418"
     }
   }
 }

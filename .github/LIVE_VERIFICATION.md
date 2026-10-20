@@ -1,5 +1,9 @@
 # Live verification: 2026-10-19
 
+> [!NOTE]
+> Resource IDs, balances, and cleanup status below describe 2026-10-19.
+> For library usage, see [API compatibility](../docs/compatibility.md).
+
 Phase 2 remains incomplete because disk attachment, graceful reboot, and
 password-reset completion could not be verified end to end. The remaining
 issues need clarification from HexCore before more billable tests.
