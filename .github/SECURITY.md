@@ -2,9 +2,8 @@
 
 ## Supported versions
 
-Until the first release, security fixes target `develop`. After releases begin,
-fixes target the latest released version through the hotfix process into
-`master`, then synchronize into `develop`. See [RELEASING.md](RELEASING.md).
+Security fixes target the latest release through the hotfix process into
+`master`, then synchronize into `develop`. See [Releasing](RELEASING.md).
 
 ## Reporting a vulnerability
 

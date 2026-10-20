@@ -6,3 +6,8 @@
 coverage.out
 coverage.txt
 test-results.json
+
+# Documentation tooling and generated site.
+node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/

@@ -1,10 +1,10 @@
 // Package hexcore provides a client for the HexCore HTTP API.
 //
-// Methods make a single HTTP request and do not retry or wait for resource
-// readiness. Actions.Wait explicitly polls asynchronous actions. All operations
-// accept a context for cancellation and deadlines.
+// Create a Client with NewClient, then use its Account, VDS, Disks, Actions,
+// and catalog services. All methods accept a context for deadlines and
+// cancellation. Requests are not retried. Use Actions.Wait to wait for an
+// action; creation and deletion need separate resource checks.
 //
-// The client implements the documented API at https://dev.hexcore.ru/.
-// Resource IDs are strings, quantities are integers, and monetary values and
-// dates retain the server's textual representation.
+// IDs are strings, quantities are integers, and prices and dates remain strings.
+// Guides and examples: https://2chevskii.github.io/go-hexcore/.
 package hexcore
